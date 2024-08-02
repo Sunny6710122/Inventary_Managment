@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantry Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS for button spacing */
+        .btn-group .btn {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Pantry Management</h1>
+    <!-- Form to add/update pantry items -->
+    <form action="/AddUpdate" method="post" id="pantryForm" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="itemName">Item Name</label>
+                <input type="text" name="Item" class="form-control" id="itemName" placeholder="Enter item name" value="{{Name1}}" required>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="itemQuantity">Quantity</label>
+                <input type="number" name="Quantity" class="form-control" id="itemQuantity" placeholder="Enter quantity" value="{{Quantity1}}" required>
+            </div>
+            <div class="form-group col-md-4 d-flex align-items-end">
+                <button type="submit" name="button" class="btn btn-primary" value="{{ID}}">Add/Update Item</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Search bar -->
+    <div class="form-group mb-4">
+        <input type="text" class="form-control" id="searchBar" placeholder="Search items" >
+    </div>
+
+    <!-- Table to display pantry items -->
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="pantryTableBody">
+            {{#each objectArray}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{quantity}}</td>
+                    <td>
+                        <div class="btn-group">
+                            <form action="/update" method="post" class="d-inline">
+                                <button type="submit" name="button" class="btn btn-warning btn-sm" value="{{docid}}">Edit</button>
+                            </form>
+                            <form action="/delete" method="post" class="d-inline">
+                                <button type="submit" name="button" class="btn btn-danger btn-sm" value="{{docid}}">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap and jQuery JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Array to hold pantry items
+    let pantryItems = [];
+
+    // Function to render pantry items in the table
+    function renderPantryItems(items) {
+        const tbody = document.getElementById('pantryTableBody');
+        tbody.innerHTML = '';
+
+        items.forEach((item, index) => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning btn-sm" onclick="editItem(${index}, '${item.name}', ${item.quantity}, '${item.docid}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem(${index})">Delete</button>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    // Function to add or update a pantry item
+    document.getElementById('pantryForm').addEventListener('submit', function(event) {
+        //event.preventDefault();
+
+        const itemName = document.getElementById('itemName1').value;
+        const itemQuantity = document.getElementById('itemQuantity1').value;
+
+        const existingItemIndex = pantryItems.findIndex(item => item.name === itemName);
+
+        if (existingItemIndex !== -1) {
+            // Update existing item
+            pantryItems[existingItemIndex].quantity = itemQuantity;
+        } else {
+            // Add new item
+            pantryItems.push({ name: itemName, quantity: itemQuantity });
+        }
+
+        renderPantryItems(pantryItems);
+        this.reset();
+    });
+
+    // Function to delete a pantry item
+    function deleteItem(index) {
+        pantryItems.splice(index, 1);
+        renderPantryItems(pantryItems);
+    }
+
+    // Function to edit a pantry item
+    function editItem(index, name, quantity, docid) {
+        console.log(name);
+        console.log(quantity);
+        console.log(docid);
+        document.getElementById('itemName').value = name;
+        document.getElementById('itemQuantity').value = quantity;
+    }
+
+
+    // Function to filter pantry items based on search input
+    function filterItems() {
+        // Get the search term
+        const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+
+        // Get all rows from the table body
+        const rows = document.querySelectorAll('#pantryTableBody tr');
+
+        // Loop through each row and filter based on search term
+        rows.forEach(row => {
+            const itemName = row.querySelector('td').textContent.toLowerCase();
+
+            // Check if the item name includes the search term
+            if (itemName.includes(searchTerm)) {
+                row.style.display = ''; // Show row
+            } else {
+                row.style.display = 'none'; // Hide row
+            }
+        });
+    }
+
+    // Attach the filter function to the search bar input event
+    document.getElementById('searchBar').addEventListener('input', filterItems);
+
+    // Initial call to filter function to ensure no items are hidden by default
+    filterItems();
+
+</script>
+
+</body>
+</html>

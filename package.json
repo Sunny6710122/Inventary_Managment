@@ -1,0 +1,15 @@
+{
+  "name": "inventry_mangement",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "firebase": "^10.12.5",
+    "firebase-admin": "^12.3.0",
+    "hbs": "^4.2.0"
+  }
+}
