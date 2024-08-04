@@ -1,14 +1,12 @@
 const express = require('express');
 const hbs = require("hbs");
 const path = require("path");
-const dotenv = require('dotenv');
-dotenv.config();
 const app = express();
-const port = 8000;
+port = 8000;
 
 const admin = require('firebase-admin');
+require('dotenv').config();
 
-// Initialize Firebase Admin SDK
 admin.initializeApp({
     credential: admin.credential.cert({
         type: process.env.FIREBASE_TYPE,
